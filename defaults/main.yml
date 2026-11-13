@@ -28,3 +28,18 @@ toolchain_lstk_version: "1.4.5"
 toolchain_lstk_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
 toolchain_lstk_url: "https://github.com/localstack/lstk/releases/download/v{{ toolchain_lstk_version }}"
 toolchain_lstk_dir: "{{ ansible_facts['user_dir'] }}/.local/share/lstk/{{ toolchain_lstk_version }}"
+
+# Verify: one command per tool. It must exit 0 and print something (its version) if the tool works.
+# Full paths for user-level tools: ~/.local/bin may not be on Ansible's PATH yet on a fresh machine.
+toolchain_bin: "{{ ansible_facts['user_dir'] }}/.local/bin"
+toolchain_verify:
+  postgresql-client: "psql --version"
+  redis-cli: "redis-cli --version"
+  docker: "d=$(docker --version) && c=$(docker compose version) && echo \"$d; $c\""
+  uv: "{{ toolchain_uv }} --version"
+  python3.12: "\"$({{ toolchain_uv }} python find 3.12)\" --version"
+  awscli: "aws --version"
+  localstack: "{{ toolchain_bin }}/lstk --version"
+  awslocal: "{{ toolchain_bin }}/lstk aws --version | grep aws-cli/"
+  pre-commit: "{{ toolchain_bin }}/pre-commit --version"
+  azurite: "docker image ls --quiet {{ toolchain_azurite_image }} | grep -q . && echo {{ toolchain_azurite_image }}"

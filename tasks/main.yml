@@ -18,3 +18,7 @@
   loop: "{{ toolchain_tools }}"
   loop_control:
     loop_var: tool
+
+- name: Verify every requested tool
+  ansible.builtin.import_tasks: verify.yml
+  tags: [verify]

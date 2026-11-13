@@ -1,0 +1,34 @@
+---
+- name: "verify | run each tool's version command"
+  ansible.builtin.shell: "{{ toolchain_verify[tool] }}"
+  args:
+    executable: /bin/bash
+  loop: "{{ toolchain_tools }}"
+  loop_control:
+    loop_var: tool
+    label: "{{ tool }}"
+  register: toolchain_versions
+  changed_when: false
+  failed_when: false
+  become: "{{ tool == 'azurite' }}"
+
+- name: "verify | version of each tool"
+  ansible.builtin.debug:
+    msg: >-
+      {{ result.tool }}:
+      {{ ((result.stdout_lines or result.stderr_lines) | first | default('(no output)'))
+         if result.rc == 0 else
+         'MISSING OR BROKEN (exit ' ~ result.rc ~ '): ' ~ ((result.stderr_lines or result.stdout_lines) | last | default('(no output)')) }}
+  loop: "{{ toolchain_versions.results }}"
+  loop_control:
+    loop_var: result
+    label: "{{ result.tool }}"
+
+- name: "verify | every requested tool works"
+  ansible.builtin.assert:
+    that:
+      - toolchain_broken | length == 0
+    fail_msg: "Missing or broken: {{ toolchain_broken | join(', ') }} (see the version lines above)"
+    quiet: true
+  vars:
+    toolchain_broken: "{{ toolchain_versions.results | rejectattr('rc', 'equalto', 0) | map(attribute='tool') | list }}"
