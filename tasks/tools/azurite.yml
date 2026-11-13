@@ -1,0 +1,15 @@
+---
+- name: "azurite | needs Docker (Azurite runs as a container)"
+  ansible.builtin.include_tasks: tools/docker.yml
+
+- name: "azurite | is the pinned image already pulled?"
+  ansible.builtin.command: "docker image inspect {{ toolchain_azurite_image }}"
+  register: toolchain_azurite
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: "azurite | pull {{ toolchain_azurite_image }}"
+  ansible.builtin.command: "docker pull {{ toolchain_azurite_image }}"
+  when: toolchain_azurite.rc != 0
+  become: true

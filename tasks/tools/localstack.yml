@@ -1,0 +1,38 @@
+---
+- name: "localstack | is lstk {{ toolchain_lstk_version }} installed?"
+  ansible.builtin.stat:
+    path: "{{ toolchain_lstk_dir }}/lstk"
+  register: toolchain_lstk_stat
+
+- name: "localstack | install lstk {{ toolchain_lstk_version }} (LocalStack's CLI)"
+  when: not toolchain_lstk_stat.stat.exists
+  block:
+    - name: "localstack | download the release, checked against its checksums.txt"
+      ansible.builtin.get_url:
+        url: "{{ toolchain_lstk_url }}/lstk_{{ toolchain_lstk_version }}_linux_{{ toolchain_lstk_arch }}.tar.gz"
+        dest: "/tmp/lstk_{{ toolchain_lstk_version }}_linux_{{ toolchain_lstk_arch }}.tar.gz"
+        checksum: "sha256:{{ toolchain_lstk_url }}/checksums.txt"
+        mode: "0644"
+
+    - name: "localstack | create {{ toolchain_lstk_dir }}"
+      ansible.builtin.file:
+        path: "{{ toolchain_lstk_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: "localstack | unpack (lstk needs the files that ship next to it)"
+      ansible.builtin.unarchive:
+        src: "/tmp/lstk_{{ toolchain_lstk_version }}_linux_{{ toolchain_lstk_arch }}.tar.gz"
+        dest: "{{ toolchain_lstk_dir }}"
+        remote_src: true
+
+- name: "localstack | make sure ~/.local/bin exists (never changes an existing folder's mode)"
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.local/bin"
+    state: directory
+
+- name: "localstack | put lstk on the PATH (~/.local/bin/lstk -> version {{ toolchain_lstk_version }})"
+  ansible.builtin.file:
+    src: "{{ toolchain_lstk_dir }}/lstk"
+    dest: "{{ ansible_facts['user_dir'] }}/.local/bin/lstk"
+    state: link

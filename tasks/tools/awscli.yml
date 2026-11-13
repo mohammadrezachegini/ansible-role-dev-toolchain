@@ -1,0 +1,37 @@
+---
+- name: "awscli | check for AWS CLI v2"
+  ansible.builtin.command: aws --version
+  register: toolchain_aws
+  changed_when: false
+  failed_when: false
+
+- name: "awscli | decide whether to install"
+  ansible.builtin.set_fact:
+    toolchain_aws_missing: "{{ toolchain_aws.rc != 0 or 'aws-cli/2' not in (toolchain_aws.stdout + toolchain_aws.stderr) }}"
+
+- name: "awscli | install AWS CLI v2 (official installer)"
+  when: toolchain_aws_missing | bool
+  block:
+    - name: "awscli | unzip is needed by the installer"
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
+    - name: "awscli | download the installer for {{ ansible_facts['architecture'] }}"
+      ansible.builtin.get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts['architecture'] }}.zip"
+        dest: /tmp/awscliv2.zip
+        mode: "0644"
+
+    - name: "awscli | unpack it"
+      ansible.builtin.unarchive:
+        src: /tmp/awscliv2.zip
+        dest: /tmp
+        remote_src: true
+
+    - name: "awscli | run the installer (/usr/local/bin/aws)"
+      ansible.builtin.command: /tmp/aws/install --update
+      become: true

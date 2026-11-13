@@ -1,0 +1,8 @@
+---
+- name: "pre-commit | make sure uv is installed"
+  ansible.builtin.include_tasks: tools/uv.yml
+
+- name: "pre-commit | install pre-commit as a uv tool"
+  ansible.builtin.command: "{{ toolchain_uv }} tool install pre-commit"
+  args:
+    creates: "{{ ansible_facts['user_dir'] }}/.local/bin/pre-commit"

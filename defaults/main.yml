@@ -9,7 +9,22 @@ toolchain_supported:
   - docker
   - uv
   - python3.12
+  - awscli
+  - localstack
+  - awslocal
+  - pre-commit
+  - azurite
 
 # uv: pinned installer version (same uv as the project's Dockerfile), installed per user.
 toolchain_uv_version: "0.13.0"
 toolchain_uv: "{{ ansible_facts['user_dir'] }}/.local/bin/uv"
+
+# Azurite runs as a container (docker-compose.yml); the toolchain pre-pulls the SAME pinned image.
+toolchain_azurite_image: "mcr.microsoft.com/azure-storage/azurite:3.37.0"
+
+# LocalStack's CLI: lstk (replaces the deprecated `localstack` CLI and `awslocal`).
+# Pinned GitHub release, unpacked into its own versioned folder, linked into ~/.local/bin.
+toolchain_lstk_version: "1.4.5"
+toolchain_lstk_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+toolchain_lstk_url: "https://github.com/localstack/lstk/releases/download/v{{ toolchain_lstk_version }}"
+toolchain_lstk_dir: "{{ ansible_facts['user_dir'] }}/.local/share/lstk/{{ toolchain_lstk_version }}"

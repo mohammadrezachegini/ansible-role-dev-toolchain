@@ -1,0 +1,8 @@
+---
+# 'awslocal' is deprecated by LocalStack: its replacement is `lstk aws`, which needs
+# the AWS CLI on the PATH. So this tool = the AWS CLI + lstk.
+- name: "awslocal | needs the AWS CLI (lstk aws runs it)"
+  ansible.builtin.include_tasks: tools/awscli.yml
+
+- name: "awslocal | provided by lstk (use: lstk aws ...)"
+  ansible.builtin.include_tasks: tools/localstack.yml
