@@ -32,6 +32,9 @@ toolchain_lstk_dir: "{{ ansible_facts['user_dir'] }}/.local/share/lstk/{{ toolch
 # Verify: one command per tool. It must exit 0 and print something (its version) if the tool works.
 # Full paths for user-level tools: ~/.local/bin may not be on Ansible's PATH yet on a fresh machine.
 toolchain_bin: "{{ ansible_facts['user_dir'] }}/.local/bin"
+# Checks that talk to the Docker daemon. They run as root: right after the role adds the user to
+# the docker group, that membership only works after the next login (lstk aws checks Docker first).
+toolchain_verify_as_root: [azurite, awslocal]
 toolchain_verify:
   postgresql-client: "psql --version"
   redis-cli: "redis-cli --version"

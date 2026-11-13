@@ -22,3 +22,4 @@
     groups: docker
     append: true
   become: true
+  register: toolchain_docker_group
