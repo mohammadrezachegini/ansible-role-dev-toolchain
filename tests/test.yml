@@ -1,0 +1,9 @@
+---
+# Run from the role repo:  ansible-playbook -i tests/inventory tests/test.yml -K
+- name: Test the dev-toolchain role on this machine
+  hosts: localhost
+  connection: local
+  roles:
+    - role: dev-toolchain
+      vars:
+        toolchain_tools: [postgresql-client, redis-cli]

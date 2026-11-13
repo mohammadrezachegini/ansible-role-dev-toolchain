@@ -1,0 +1,8 @@
+---
+- name: "postgresql-client | install psql"
+  ansible.builtin.apt:
+    name: postgresql-client
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true

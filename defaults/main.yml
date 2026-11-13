@@ -1,0 +1,8 @@
+---
+# Tools this machine should have. Each project's bootstrap.yml sets its own list.
+toolchain_tools: []
+
+# Every tool the role knows how to install (one file per tool in tasks/tools/).
+toolchain_supported:
+  - postgresql-client
+  - redis-cli
