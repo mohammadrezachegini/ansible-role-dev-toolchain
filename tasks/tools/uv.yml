@@ -1,0 +1,17 @@
+---
+- name: "uv | is uv already installed?"
+  ansible.builtin.stat:
+    path: "{{ toolchain_uv }}"
+  register: toolchain_uv_stat
+
+- name: "uv | download the installer for uv {{ toolchain_uv_version }}"
+  ansible.builtin.get_url:
+    url: "https://astral.sh/uv/{{ toolchain_uv_version }}/install.sh"
+    dest: "/tmp/uv-{{ toolchain_uv_version }}-install.sh"
+    mode: "0755"
+  when: not toolchain_uv_stat.stat.exists
+
+- name: "uv | run the installer (installs into ~/.local/bin)"
+  ansible.builtin.command: "sh /tmp/uv-{{ toolchain_uv_version }}-install.sh"
+  args:
+    creates: "{{ toolchain_uv }}"

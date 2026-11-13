@@ -6,4 +6,4 @@
   roles:
     - role: dev-toolchain
       vars:
-        toolchain_tools: [postgresql-client, redis-cli]
+        toolchain_tools: [postgresql-client, redis-cli, docker, uv, python3.12]

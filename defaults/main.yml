@@ -6,3 +6,10 @@ toolchain_tools: []
 toolchain_supported:
   - postgresql-client
   - redis-cli
+  - docker
+  - uv
+  - python3.12
+
+# uv: pinned installer version (same uv as the project's Dockerfile), installed per user.
+toolchain_uv_version: "0.13.0"
+toolchain_uv: "{{ ansible_facts['user_dir'] }}/.local/bin/uv"

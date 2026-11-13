@@ -1,0 +1,13 @@
+---
+- name: "python3.12 | make sure uv is installed (it manages the Python)"
+  ansible.builtin.include_tasks: tools/uv.yml
+
+- name: "python3.12 | look for a Python 3.12 that uv can use"
+  ansible.builtin.command: "{{ toolchain_uv }} python find 3.12"
+  register: toolchain_py312
+  changed_when: false
+  failed_when: false
+
+- name: "python3.12 | install Python 3.12 with uv (next to the system Python)"
+  ansible.builtin.command: "{{ toolchain_uv }} python install 3.12"
+  when: toolchain_py312.rc != 0
