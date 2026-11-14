@@ -28,6 +28,4 @@
     msg: >-
       {{ ansible_facts['user_id'] }} was just added to the 'docker' group. Log out and back in
       (or run: newgrp docker) before using docker without sudo.
-  when:
-    - toolchain_docker_group is defined
-    - toolchain_docker_group is changed
+  when: toolchain_docker_group_added | default(false)

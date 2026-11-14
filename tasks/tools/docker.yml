@@ -23,3 +23,10 @@
     append: true
   become: true
   register: toolchain_docker_group
+
+# register keeps only the LAST run, and this file runs again via azurite. set_fact with a
+# `when` only ever SETS the flag, so a later "ok" run can't clear it.
+- name: docker | remember that the user was just added to the docker group
+  ansible.builtin.set_fact:
+    toolchain_docker_group_added: true
+  when: toolchain_docker_group is changed
